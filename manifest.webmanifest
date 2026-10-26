@@ -1,0 +1,26 @@
+{
+  "name": "Calendario de Cuidados Caninos · FiruBack",
+  "short_name": "FiruBack Cuidados",
+  "description": "Registra, consulta y organiza los cuidados de tu perro en tu propio dispositivo.",
+  "start_url": "./",
+  "id": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f7f3",
+  "theme_color": "#123d53",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "lang": "es-MX"
+}

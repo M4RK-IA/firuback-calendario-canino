@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123d53">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <meta name="description" content="Tu calendario digital FiruBack para organizar vacunas, higiene, revisiones y otros cuidados de tu perro.">
+  <title>Calendario de Cuidados Caninos | FiruBack</title>
+  <style>
+    :root { color-scheme: light; --navy:#153c52; --navy-deep:#102d40; --teal:#127f83; --teal-light:#e3f3ee; --paper:#f8f7f3; --white:#fff; --ink:#223649; --muted:#637789; --border:#dfe8e8; --amber:#f3c67b; --orange:#d97f4b; --shadow:0 18px 50px rgba(19,58,77,.075); --radius:20px; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; line-height:1.5; }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline:3px solid #ffb545; outline-offset:3px; }
+    .container { width:min(1160px,calc(100% - 36px)); margin-inline:auto; }
+    header { background:var(--navy-deep); color:#fff; }
+    .header-inner { min-height:70px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .brand { color:#fff; font-size:1.16rem; letter-spacing:.055em; font-weight:850; display:flex; align-items:center; gap:11px; }
+    .brand-mark { display:grid; place-items:center; background:#d8f1e8; color:#154c59; width:39px; height:39px; border-radius:12px; font-size:1.18rem; }
+    .brand em { font-style:normal; color:#91dfd4; }
+    .header-right { font-size:.87rem; color:#cfebed; text-align:right; }
+    .hero { padding:53px 0 29px; position:relative; overflow:hidden; }
+    .hero::after { content:""; position:absolute; width:320px;height:320px;right:-130px;top:-120px;border-radius:50%;background:radial-gradient(circle,#d4efe4 5%,transparent 72%);z-index:-1; }
+    .eyebrow { color:var(--teal); letter-spacing:.12em; font-size:.75rem; font-weight:850; text-transform:uppercase; }
+    h1 { color:var(--navy-deep); letter-spacing:-.055em; line-height:1.07; font-size:clamp(2.25rem,4.9vw,4.15rem); max-width:760px; margin:12px 0 13px; }
+    .hero p { max-width:640px; font-size:1.02rem; color:#52697a; margin:0; }
+    .hero-bottom { display:flex; flex-wrap:wrap; gap:13px; margin-top:22px; align-items:center; }
+    .chip { display:inline-flex; align-items:center; gap:8px; border-radius:30px; background:#e5f1ed; color:#146368; padding:8px 13px; font-size:.83rem; font-weight:750; }
+    .chip.amber { background:#fff0d8; color:#865f28; }
+    .mini-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:8px; margin-bottom:24px; }
+    .step { background:#fff; border:1px solid var(--border); border-radius:15px; padding:16px; display:flex; gap:11px; align-items:flex-start; }
+    .step-num { flex-shrink:0; display:grid; place-items:center; width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font-weight:750;font-size:.87rem; }
+    .step strong { display:block; font-size:.9rem; }
+    .step small { color:var(--muted); display:block; font-size:.8rem; margin-top:3px; }
+    .layout { display:grid; grid-template-columns:minmax(0, 1.75fr) minmax(255px, .95fr); align-items:start; gap:21px; margin-bottom:46px; }
+    .main-stack,.side-stack { display:grid; gap:19px; }
+    .panel { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); }
+    .section-title { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:11px; margin-bottom:19px; }
+    h2 { font-size:1.34rem; color:var(--navy-deep); letter-spacing:-.03em; margin:0; }
+    h3 { color:var(--navy-deep); margin:0; font-size:1.02rem; }
+    .muted { color:var(--muted); font-size:.86rem; }
+    .month-actions { display:flex; align-items:center; gap:8px; }
+    .icon-btn { background:#eff5f5; border:1px solid #dce7e6; color:var(--navy); width:37px;height:37px;display:grid;place-items:center;border-radius:11px;font-size:1.12rem;font-weight:700; }
+    .icon-btn:hover { background:#deeeee; }
+    .month-label { font-size:1.18rem; font-weight:800; letter-spacing:-.025em; color:var(--navy-deep); }
+    .weekdays,.days { display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px; }
+    .weekdays { margin-bottom:7px; }
+    .weekday { text-align:center; color:#728796; font-size:.73rem; font-weight:800; padding:6px 0; }
+    .day { appearance:none; background:#fbfdfc; border:1px solid #e9efee; border-radius:12px; min-height:70px; padding:8px 5px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:6px; color:#334c5c; transition:background .15s,border-color .15s; }
+    .day[disabled] { background:transparent; border-color:transparent; cursor:default; }
+    .day:not([disabled]):hover { background:#edf7f3; border-color:#a9d5cb; }
+    .day.today { border-color:#65bcb5; }
+    .day.selected { background:var(--navy); border-color:var(--navy); color:#fff; }
+    .day-number { font-weight:700; font-size:.91rem; }
+    .today .day-number::after { content:" ·"; color:var(--teal); }
+    .selected.today .day-number::after { color:#a9e8dd; }
+    .dots { display:flex; justify-content:center; gap:3px; flex-wrap:wrap; }
+    .dot { width:5px;height:5px;border-radius:50%;background:var(--orange); }
+    .day.selected .dot { background:var(--amber); }
+    .calendar-caption { display:flex; gap:13px; justify-content:space-between; flex-wrap:wrap; align-items:center; margin-top:14px; }
+    .btn { padding:11px 16px; border:1px solid transparent; border-radius:12px; font-size:.91rem; font-weight:750; display:inline-flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; transition:background .15s; }
+    .btn-primary { background:var(--navy); color:#fff; }
+    .btn-primary:hover { background:#235c70; }
+    .btn-ghost { background:#f2f6f6; color:var(--navy); border-color:var(--border); }
+    .btn-ghost:hover { background:#e4eeed; }
+    .btn-danger { background:#fff6f2;color:#a54334;border-color:#f1d2c8; }
+    .btn-small { padding:7px 10px; font-size:.78rem;border-radius:9px; }
+    .label { display:block; font-size:.81rem; font-weight:800; color:#365268; margin-bottom:7px; }
+    .input { width:100%; background:#fff; color:var(--ink); border:1px solid #ccd9da; border-radius:11px; padding:12px 13px; outline:none; }
+    .input:focus { border-color:#2a9896; box-shadow:0 0 0 3px #d5f0e9; }
+    textarea.input { resize:vertical; min-height:68px; }
+    .fields { display:grid;grid-template-columns:1fr 1fr;gap:13px; }
+    .fields>.full { grid-column:1 / -1; }
+    .field-hint { color:var(--muted);font-size:.77rem;margin:7px 0 0; }
+    .form-actions { display:flex;flex-wrap:wrap;gap:9px; margin-top:17px; }
+    .form-header { display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px; }
+    .form-wrapper[hidden],.hidden[hidden] { display:none !important; }
+    .task-list { display:grid;gap:10px; }
+    .task { border:1px solid #e4ebeb;border-radius:13px;padding:13px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:11px;background:#fcfdfc; }
+    .task-check { accent-color:var(--teal);width:20px;height:20px;margin-top:3px;cursor:pointer; }
+    .task-name { font-weight:750; color:var(--navy-deep);overflow-wrap:anywhere; }
+    .task-name.done { text-decoration:line-through;color:#7d8e93; }
+    .task-meta {display:flex;flex-wrap:wrap; gap:6px;align-items:center;margin-top:4px;color:var(--muted);font-size:.79rem;}
+    .task-notes {white-space:pre-wrap;word-break:break-word;margin:8px 0 0;font-size:.82rem;color:#556c78;}
+    .pill {background:#eaf5f3;color:#176871;border-radius:6px;padding:3px 7px;font-size:.72rem;font-weight:700;}
+    .task-buttons {display:flex;flex-direction:column;gap:6px;}
+    .task-buttons button {background:transparent;border:0;color:var(--teal);font-size:.76rem;font-weight:750;padding:3px;text-align:right;}
+    .task-buttons button.delete {color:#b35544;}
+    .empty {display:grid;justify-items:center;text-align:center;padding:28px 13px;border:1px dashed #d7e5e2;border-radius:14px;background:#fcfefd;}
+    .empty-icon {font-size:1.8rem;}
+    .empty strong {display:block;margin:5px 0 3px;color:var(--navy);}
+    .empty p {margin:0;font-size:.84rem;color:var(--muted);max-width:350px;}
+    .pet-badge {display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:#fff1df;font-size:1.48rem;}
+    .pet-heading {display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+    .pet-heading h2 {font-size:1.2rem;}
+    .pet-heading p {margin:2px 0 0;color:var(--muted);font-size:.83rem;}
+    .side-note {padding:14px;background:#e8f5f1;border:1px solid #d3eae2;color:#285967;border-radius:13px;font-size:.83rem;line-height:1.48;}
+    .upcoming {display:grid;gap:11px;}
+    .up-row {border-bottom:1px solid #edf1f1;padding-bottom:11px;display:flex;justify-content:space-between;gap:12px;}
+    .up-row:last-child {border-bottom:0;padding-bottom:0;}
+    .up-row strong {font-size:.85rem;display:block;overflow-wrap:anywhere;}
+    .up-row small {font-size:.75rem;color:var(--muted);}
+    .up-date {font-size:.75rem;font-weight:800;color:var(--teal);white-space:nowrap;}
+    details.help { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px;box-shadow:var(--shadow); }
+    details.help summary {font-weight:800;color:var(--navy);cursor:pointer;font-size:1.07rem;}
+    .help-content {display:grid;gap:12px;margin-top:18px;}
+    .help-block {padding-bottom:12px;border-bottom:1px solid #edf2f1;}
+    .help-block:last-child {border-bottom:0;padding-bottom:0;}
+    .help-block strong {color:var(--navy);font-size:.88rem;}
+    .help-block p {margin:4px 0 0;font-size:.82rem;color:#5c7180;}
+    .privacy {font-size:.82rem;color:#506979;margin-top:13px;}
+    .file-actions {display:flex;flex-wrap:wrap;gap:8px;margin-top:15px;}
+    .file-actions .btn {font-size:.81rem;}
+    footer {background:#e7eeed;border-top:1px solid var(--border);padding:23px 0;color:#536f80;font-size:.82rem;}
+    .footer-inner {display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+    #toast {position:fixed;bottom:20px;left:50%;transform:translate(-50%,150%);opacity:0;pointer-events:none;border-radius:12px;background:#173f50;color:#fff;font-size:.88rem;padding:12px 18px;z-index:100;box-shadow:0 10px 30px #183b4b25;transition:transform .2s,opacity .2s;max-width:min(90vw,470px);text-align:center;}
+    #toast.show {opacity:1;transform:translate(-50%,0);}
+    .save-status {display:flex; align-items:flex-start; gap:10px; padding:12px 16px; background:#e7f5f0; border:1px solid #beded4; color:#1c5b58; border-radius:13px; font-size:.85rem; font-weight:680; margin:5px 0 22px;}
+    .save-status.warning {background:#fff2df; border-color:#f0c88e; color:#775121;}
+    .save-status.error {background:#fff0eb; border-color:#efbdad; color:#994a38;}
+    .save-status .symbol {font-size:1.1rem; line-height:1.2; flex:none;}
+    .save-status strong {display:block;}
+    .save-status small {display:block; font-weight:450; font-size:.8rem; margin-top:3px;}
+    .field-feedback {font-size:.81rem; padding:10px 12px; margin:12px 0 0; color:#156263; background:#e8f6f0; border:1px solid #b3dcd0; border-radius:10px;}
+    .field-feedback.error {color:#963d2d;background:#fff3f0;border-color:#f3c2b7;}
+    .saved-profile {font-size:.84rem; color:#276c6a; background:#ebf7f2; border:1px solid #d0e9df; padding:11px 12px; border-radius:10px; margin-top:13px; overflow-wrap:anywhere;}
+    .all-list {display:grid; gap:8px; max-height:400px; overflow:auto;}
+    .all-item {display:flex; justify-content:space-between; gap:12px; align-items:center; padding:11px 12px; border-radius:11px; border:1px solid var(--border); background:#fafffd;}
+    .all-item strong {display:block; font-size:.87rem; overflow-wrap:anywhere;}
+    .all-item small {display:block; font-size:.77rem; color:var(--muted); margin-top:3px;}
+    .all-item button {flex:none;}
+    .install-howto {margin-top:15px; border:1px solid #c8e3e0; border-radius:14px; padding:17px; background:#f4fbf8;}
+    .install-howto[hidden] {display:none !important;}
+    .install-howto h3 {margin-bottom:7px;}
+    .install-howto p {margin:0; color:#536a76; font-size:.86rem;}
+    .sr-only { position:absolute; width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+    @media(max-width:940px) { .layout{grid-template-columns:1fr;} .side-stack{grid-template-columns:1fr 1fr;align-items:start;} .side-stack>details{grid-column:1/-1;} }
+    @media(max-width:610px) { .container{width:min(100% - 24px,1160px);} .hero{padding:35px 0 24px;} .header-right{font-size:.72rem;} .mini-steps{grid-template-columns:1fr;gap:8px;} .step{padding:11px 13px;} .step strong{font-size:.84rem;} .step small{font-size:.74rem;margin-top:1px;} .panel{padding:17px;border-radius:16px;} .section-title{margin-bottom:14px;} .day{min-height:57px;padding:6px 2px;border-radius:10px;} .days,.weekdays{gap:3px;} .fields{grid-template-columns:1fr;} .fields>.full{grid-column:auto;} .side-stack{grid-template-columns:1fr;} .side-stack>details{grid-column:auto;} .calendar-caption .btn{width:100%;} .task{grid-template-columns:auto minmax(0,1fr);}.task-buttons{grid-column:2;flex-direction:row;gap:16px;} .task-buttons button{text-align:left;} .header-inner{min-height:62px;} .brand{font-size:1.02rem;} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">🐾</span><span>FIRU<em>BACK</em></span></div>
+      <div class="header-right">Tu espacio de cuidados caninos</div>
+    </div>
+  </header>
+  <main>
+    <section class="hero container">
+      <div class="eyebrow">Calendario de Cuidados Caninos · FiruBack</div>
+      <h1>Su bienestar, <br>día a día. 🐶</h1>
+      <p>Apunta sus vacunas, desparasitaciones, visitas al veterinario y cualquier otro evento importante. Marca lo que ya hiciste y ten a la vista lo que viene después.</p>
+      <div class="hero-bottom">
+        <span class="chip">✓ Interactivo y fácil de usar</span>
+        <span class="chip amber">🔒 Sin cuenta ni registro</span>
+        <button type="button" class="btn btn-primary btn-small" id="installBtn">📱 Acceso directo al móvil</button>
+        <button type="button" class="btn btn-ghost btn-small" id="openHelp">Ver todas las funciones ↓</button>
+      </div>
+    </section>
+    <div class="container">
+      <div id="saveStatus" class="save-status" role="status" aria-live="polite"><span class="symbol">💾</span><div><strong>Comprobando el guardado...</strong><small>Tus registros se almacenan en el navegador de este dispositivo.</small></div></div>
+      <div id="installHowto" class="install-howto" hidden tabindex="-1">
+        <h3>📱 Cómo poner FiruBack en la pantalla de inicio</h3>
+        <p id="installText">Abre esta web desde el navegador de tu teléfono y usa la opción «Añadir a pantalla de inicio» de su menú.</p>
+        <p style="margin-top:8px"><strong>Importante:</strong> abre siempre la misma dirección web y el mismo navegador para conservar los registros. La instalación no sincroniza los datos entre teléfonos.</p>
+        <button type="button" class="btn btn-ghost btn-small" id="closeInstall" style="margin-top:10px">Entendido, cerrar</button>
+      </div>
+    </div>
+    <section class="container mini-steps" aria-label="Cómo empezar">
+      <div class="step"><span class="step-num">1</span><div><strong>Personaliza su ficha</strong><small>Escribe el nombre de tu perro.</small></div></div>
+      <div class="step"><span class="step-num">2</span><div><strong>Selecciona una fecha</strong><small>Toca un día del calendario.</small></div></div>
+      <div class="step"><span class="step-num">3</span><div><strong>Registra un cuidado</strong><small>Añade una vacuna, una cita u otro evento.</small></div></div>
+    </section>
+    <div class="container layout">
+      <div class="main-stack">
+        <section class="panel" aria-label="Calendario">
+          <div class="section-title"><h2>Mi calendario de vacunas y eventos</h2><div class="month-actions"><button type="button" class="icon-btn" id="prevMonth" aria-label="Mes anterior">‹</button><button type="button" class="icon-btn" id="nextMonth" aria-label="Mes siguiente">›</button></div></div>
+          <div class="section-title"><div class="month-label" id="monthLabel"></div><button type="button" class="btn btn-ghost btn-small" id="goToday">Ir a hoy</button></div>
+          <div class="weekdays" aria-hidden="true"><span class="weekday">Lun</span><span class="weekday">Mar</span><span class="weekday">Mié</span><span class="weekday">Jue</span><span class="weekday">Vie</span><span class="weekday">Sáb</span><span class="weekday">Dom</span></div>
+          <div class="days" id="calendarDays" aria-label="Días del mes"></div>
+          <div class="calendar-caption"><span class="muted">● Los puntos indican eventos registrados.</span><button type="button" class="btn btn-primary" id="addFromCalendar">＋ Añadir evento</button></div>
+        </section>
+        <section class="panel" id="tasksSection">
+          <div class="section-title"><div><h2>Eventos del día</h2><div class="muted" id="selectedLabel" aria-live="polite"></div></div></div>
+          <div class="task-list" id="taskList"></div>
+        </section>
+        <section class="panel" id="allSavedSection">
+          <div class="section-title"><div><h2>Todos mis eventos guardados</h2><div class="muted" id="savedCount">0 eventos</div></div></div>
+          <div id="allSavedList" class="all-list" aria-live="polite"></div>
+          <p class="field-hint">Aquí aparecen todas tus vacunas y eventos, aunque cambies de mes. Pulsa «Ver día» para abrirlos.</p>
+          <div class="file-actions" aria-label="Copias de seguridad del calendario"><button type="button" class="btn btn-ghost btn-small" id="exportQuickBtn">↓ Guardar una copia</button><button type="button" class="btn btn-ghost btn-small" id="importQuickBtn">↑ Recuperar una copia</button></div>
+        </section>
+        <section class="panel form-wrapper" id="formWrapper" hidden>
+          <div class="form-header"><h2 id="formTitle">Añadir evento</h2><button type="button" class="icon-btn" id="closeForm" aria-label="Cerrar formulario">×</button></div>
+          <form id="taskForm" novalidate>
+            <div class="fields">
+              <div class="full"><label class="label" for="taskTitle">¿Qué quieres recordar? *</label><input class="input" id="taskTitle" maxlength="100" placeholder="Ej. Vacuna antirrábica, baño o cita veterinaria" required></div>
+              <div><label class="label" for="taskDate">Fecha *</label><input class="input" type="date" id="taskDate" required></div>
+              <div><label class="label" for="taskCategory">Tipo de cuidado</label><select class="input" id="taskCategory"><option>Vacunas</option><option>Veterinario</option><option>Desparasitación</option><option>Higiene</option><option>Paseos</option><option>Alimentación</option><option>Evento especial</option><option>Otro</option></select></div>
+              <div class="full"><label class="label" for="taskNotes">Notas (opcional)</label><textarea class="input" id="taskNotes" maxlength="600" placeholder="Ej. Hora, nombre del veterinario o algún detalle útil"></textarea></div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" type="submit" id="saveTask">Guardar evento</button><button class="btn btn-ghost" type="button" id="cancelForm">Cancelar</button></div><p id="taskFeedback" class="field-feedback" role="status" aria-live="polite" hidden></p>
+          </form>
+        </section>
+      </div>
+      <aside class="side-stack">
+        <section class="panel">
+          <div class="pet-heading"><div class="pet-badge" aria-hidden="true">🐕</div><div><h2>Mi compañero</h2><p>La ficha de tu perro</p></div></div>
+          <form id="petForm">
+            <label class="label" for="petName">Nombre de tu perro</label><input class="input" type="text" id="petName" maxlength="50" placeholder="Ej. Canelo" autocomplete="off">
+            <label class="label" for="petBreed" style="margin-top:14px">Raza (opcional)</label><input class="input" type="text" id="petBreed" maxlength="70" placeholder="Ej. Mestizo" autocomplete="off">
+            <div class="form-actions"><button type="submit" class="btn btn-primary">Guardar su ficha</button></div><p id="profileFeedback" class="field-feedback" role="status" aria-live="polite" hidden></p>
+          </form>
+          <div class="saved-profile" id="savedProfile" aria-live="polite">Sin ficha guardada todavía.</div>
+          <p class="field-hint">Tus datos se conservan en este navegador. Haz una copia desde «Todos mis eventos guardados» por seguridad.</p>
+          <div class="side-note" style="margin-top:18px">💚 <strong>Un calendario a tu ritmo.</strong> Las fechas de vacunas y tratamientos debes confirmarlas con tu veterinario; aquí solo organizas tus propios recordatorios.</div>
+        </section>
+        <section class="panel"><div class="section-title"><h2>Próximos eventos</h2></div><div id="upcoming" class="upcoming"></div></section>
+        <details class="help" id="help">
+          <summary>❔ Cómo usar todas las funciones</summary>
+          <div class="help-content">
+            <div class="help-block"><strong>🐕 Guardar la ficha</strong><p>Escribe el nombre y, si quieres, la raza. Pulsa «Guardar su ficha». No necesitas registrarte.</p></div>
+            <div class="help-block"><strong>🗓 Elegir y cambiar fechas</strong><p>Toca un número del calendario para verlo. Usa las flechas para pasar de mes, o «Ir a hoy» para volver al día actual.</p></div>
+            <div class="help-block"><strong>＋ Añadir vacunas y eventos</strong><p>Pulsa «Añadir evento» y escribe el nombre (obligatorio), la fecha y el tipo. Por ejemplo, «Vacuna antirrábica». Añade notas si lo necesitas y pulsa «Guardar evento». Aparecerá en «Todos mis eventos guardados».</p></div>
+            <div class="help-block"><strong>✓ Marcar, editar o eliminar</strong><p>Marca la casilla cuando completes un cuidado. «Editar» permite modificarlo; «Eliminar» lo borra después de confirmarlo.</p></div>
+            <div class="help-block"><strong>📌 Consultar lo próximo</strong><p>«Próximos eventos» muestra las próximas fechas pendientes. La web no envía notificaciones automáticas ni decide fechas de vacunación.</p></div>
+            <div class="help-block"><strong>📱 Acceso directo al móvil</strong><p>Pulsa «Acceso directo al móvil» en la parte superior. En iPhone abre la web en Safari, usa Compartir y «Añadir a pantalla de inicio». En Android usa el menú de Chrome y «Instalar aplicación» o «Añadir a pantalla de inicio».</p></div>
+            <div class="help-block"><strong>📋 Ver todos los registros</strong><p>La sección «Todos mis eventos guardados» muestra los eventos de cualquier fecha. Toca «Ver día» para consultarlos, editarlos o marcarlos como realizados.</p></div>
+            <div class="help-block"><strong>💾 Guardado y copia de seguridad</strong><p>Los datos se guardan automáticamente en este navegador. Para conservarlos o llevarlos a otro dispositivo, descarga una copia desde «Exportar copia» e impórtala después.</p></div>
+            <div class="help-block"><strong>🔐 Privacidad</strong><p>No se envían tus anotaciones a FiruBack ni a un servidor desde esta página. Si borras los datos de navegación o abres otro dispositivo, podrían no aparecer hasta que importes tu copia.</p></div>
+          </div>
+          <div class="file-actions"><button type="button" class="btn btn-primary" id="exportBtn">↓ Exportar copia</button><button type="button" class="btn btn-ghost" id="importBtn">↑ Importar copia</button><input id="importFile" type="file" accept="application/json,.json" class="sr-only" aria-label="Seleccionar copia de seguridad"></div>
+          <p class="privacy">No sustituye indicaciones veterinarias. Para una experiencia fiable, evita usar el modo incógnito.</p>
+        </details>
+      </aside>
+    </div>
+  </main>
+  <footer><div class="container footer-inner"><strong>FIRUBACK · Cuidados con cariño</strong><span>Más control. Más seguridad. Más tranquilidad.</span></div></footer>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script>
+  (() => {
+    'use strict';
+    const KEY = 'firuback.calendar.v1'; // Se conserva la misma clave para mantener datos de versiones previas.
+    const CATEGORIES = ['Vacunas','Veterinario','Desparasitación','Higiene','Paseos','Alimentación','Evento especial','Otro'];
+    const $ = (id) => document.getElementById(id);
+    const formatISO = (date) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    const today = () => formatISO(new Date());
+    const validDate = (v) => typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(new Date(v+'T12:00:00').getTime()) && formatISO(new Date(v+'T12:00:00'))===v;
+    const dateDisplay = (str,options={day:'numeric',month:'short'}) => new Date(str+'T12:00:00').toLocaleDateString('es-MX',options);
+    const escapeHTML = (v) => String(v??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const newId = () => (typeof crypto!=='undefined' && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+'-'+Math.random().toString(36).slice(2);
+    let state={profile:{name:'',breed:''},tasks:[]};
+    let storageAvailable=true;
+    let selected=today();
+    let viewDate = new Date();
+    let editingId = null;
+    let toastTimer;
+    let deferredInstallPrompt=null;
+    const isDownloadedFile = location.protocol === 'file:' || location.origin === 'null';
+    const isEmbeddedPreview = window.top !== window.self;
+
+    function feedback(id,message,kind='ok') { const node=$(id); node.hidden=!message; node.textContent=message||''; node.className='field-feedback'+(kind==='error'?' error':''); }
+    function notice(message) { const el=$('toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),3500); }
+    function sanitizeData(data) {
+      if(!data || typeof data!=='object' || !data.profile || !Array.isArray(data.tasks)) throw new Error('Archivo de copia no válido');
+      if(data.tasks.length>3000) throw new Error('La copia contiene demasiados cuidados');
+      const profile={name:String(data.profile.name??'').slice(0,50),breed:String(data.profile.breed??'').slice(0,70)};
+      const tasks=data.tasks.map(t=>{
+        if(!t || typeof t!=='object'||!validDate(t.date)||!String(t.title??'').trim()) throw new Error('Una tarea de la copia está incompleta');
+        return {id:String(t.id||newId()).slice(0,100),date:t.date,title:String(t.title).slice(0,100),category:CATEGORIES.includes(t.category)?t.category:'Otro',notes:String(t.notes??'').slice(0,600),done:t.done===true};
+      });
+      return {profile,tasks};
+    }
+    function updateSaveStatus(kind='ready') {
+      const el=$('saveStatus'); const hasData=state.tasks.length>0||Boolean(state.profile.name||state.profile.breed);
+      const msg=isDownloadedFile?'Estás viendo un HTML descargado. Publica esta web y usa su enlace HTTPS para un guardado más fiable.':isEmbeddedPreview?'Estás en una vista previa. Abre la dirección pública de la web para guardar de forma estable.':'Se guarda en este navegador y dispositivo. No se sincroniza con otros teléfonos.';
+      if(!storageAvailable){el.className='save-status error';el.innerHTML='<span class="symbol">⚠️</span><div><strong>No se pudieron guardar los cambios en este navegador</strong><small>Abre la versión publicada en HTTPS, evita incógnito y utiliza «Exportar copia» si tienes información importante.</small></div>';return;}
+      if(isDownloadedFile||isEmbeddedPreview){el.className='save-status warning';el.innerHTML=`<span class="symbol">⚠️</span><div><strong>Estás usando una versión de prueba</strong><small>${msg}</small></div>`;return;}
+      el.className='save-status'; el.innerHTML=`<span class="symbol">✅</span><div><strong>${kind==='saved'?'Guardado comprobado en este dispositivo':hasData?'Tus datos están guardados en este navegador':'Guardado local disponible'}</strong><small>${msg}</small></div>`;
+    }
+    function load() {
+      try {const raw=localStorage.getItem(KEY);if(raw)state=sanitizeData(JSON.parse(raw));
+      } catch(e) { storageAvailable=false; notice('No se pudo recuperar el guardado local. Prueba el enlace HTTPS.'); }
+      updateSaveStatus();
+    }
+    function persist() {
+      try {const payload=JSON.stringify(state);localStorage.setItem(KEY,payload);
+        if(localStorage.getItem(KEY)!==payload)throw new Error('No se verificó el guardado');
+        storageAvailable=true; updateSaveStatus('saved');return true;
+      } catch(e){storageAvailable=false;updateSaveStatus();notice('No se guardó en este navegador. Exporta una copia si necesitas conservarlo.');return false;}
+    }
+    function renderCalendar() {
+      const year=viewDate.getFullYear(), month=viewDate.getMonth();
+      const readableMonth=viewDate.toLocaleDateString('es-MX',{month:'long',year:'numeric'}); $('monthLabel').textContent=readableMonth.charAt(0).toUpperCase()+readableMonth.slice(1);
+      const first=new Date(year,month,1), offset=(first.getDay()+6)%7, last=new Date(year,month+1,0).getDate();
+      const cells=Math.ceil((offset+last)/7)*7;
+      const byDay={}; state.tasks.forEach(t=>{byDay[t.date]=(byDay[t.date]||0)+1;});
+      const parent=$('calendarDays'); parent.replaceChildren();
+      for(let i=0;i<cells;i++) {
+        const day=i-offset+1;
+        const button=document.createElement('button');button.type='button';button.className='day';
+        if(day<1||day>last) {button.disabled=true;button.setAttribute('aria-hidden','true');parent.appendChild(button);continue;}
+        const date=formatISO(new Date(year,month,day));
+        const count=byDay[date]||0;
+        if(date===today())button.classList.add('today');
+        if(date===selected){button.classList.add('selected');button.setAttribute('aria-pressed','true');}
+        else button.setAttribute('aria-pressed','false');
+        button.setAttribute('aria-label',`${dateDisplay(date,{weekday:'long',day:'numeric',month:'long'})}${count?`; ${count} evento${count>1?'s':''}`:''}`);
+        button.innerHTML=`<span class="day-number">${day}</span>${count?`<span class="dots" aria-hidden="true">${'<span class="dot"></span>'.repeat(Math.min(count,3))}</span>`:''}`;
+        button.addEventListener('click',()=>{selected=date;render();});
+        parent.appendChild(button);
+      }
+    }
+    function renderTasks() {
+      $('selectedLabel').textContent=dateDisplay(selected,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      const tasks=state.tasks.filter(t=>t.date===selected).sort((a,b)=>Number(a.done)-Number(b.done)||a.title.localeCompare(b.title));
+      const list=$('taskList');
+      if(!tasks.length){list.innerHTML='<div class="empty"><span class="empty-icon" aria-hidden="true">🐾</span><strong>Un día tranquilo</strong><p>Todavía no tienes eventos anotados para esta fecha. Añade una vacuna o cualquier otro cuidado cuando lo necesites.</p></div>';return;}
+      list.innerHTML=tasks.map(t=>`<article class="task"><input type="checkbox" class="task-check" data-action="toggle" data-id="${escapeHTML(t.id)}" aria-label="Marcar ${escapeHTML(t.title)} como ${t.done?'pendiente':'realizado'}" ${t.done?'checked':''}><div><div class="task-name ${t.done?'done':''}">${escapeHTML(t.title)}</div><div class="task-meta"><span class="pill">${escapeHTML(t.category)}</span><span>${t.done?'✓ Completado':'Pendiente'}</span></div>${t.notes?`<p class="task-notes">${escapeHTML(t.notes)}</p>`:''}</div><div class="task-buttons"><button type="button" data-action="edit" data-id="${escapeHTML(t.id)}">Editar</button><button type="button" class="delete" data-action="delete" data-id="${escapeHTML(t.id)}">Eliminar</button></div></article>`).join('');
+    }
+    function renderUpcoming(){
+      const events=state.tasks.filter(t=>!t.done&&t.date>=today()).sort((a,b)=>a.date.localeCompare(b.date)||a.title.localeCompare(b.title)).slice(0,5);
+      $('upcoming').innerHTML=events.length?events.map(t=>`<div class="up-row"><div><strong>${escapeHTML(t.title)}</strong><small>${escapeHTML(t.category)}</small></div><span class="up-date">${escapeHTML(dateDisplay(t.date))}</span></div>`).join(''):'<p class="muted" style="margin:0">Todavía no tienes eventos próximos. Cuando añadas una fecha futura, aparecerá aquí.</p>';
+    }
+    function renderAllSaved(){
+      const list=$('allSavedList');const sorted=[...state.tasks].sort((a,b)=>a.date.localeCompare(b.date)||a.title.localeCompare(b.title));
+      $('savedCount').textContent=`${sorted.length} evento${sorted.length===1?'':'s'} registrado${sorted.length===1?'':'s'}`;
+      if(!sorted.length){list.innerHTML='<div class="empty"><span class="empty-icon" aria-hidden="true">🗓️</span><strong>Aún no hay eventos registrados</strong><p>Al pulsar «Guardar evento» aparecerá aquí tu registro y podrás encontrarlo cualquier día.</p></div>';return;}
+      list.innerHTML=sorted.map(t=>`<div class="all-item"><div><strong>${t.done?'✓ ':''}${escapeHTML(t.title)}</strong><small>${escapeHTML(dateDisplay(t.date,{day:'numeric',month:'long',year:'numeric'}))} · ${escapeHTML(t.category)} · ${t.done?'Realizado':'Pendiente'}</small></div><button type="button" class="btn btn-ghost btn-small" data-go-date="${t.date}">Ver día</button></div>`).join('');
+    }
+    function renderProfile(){
+      const name=state.profile.name.trim(),breed=state.profile.breed.trim();
+      $('savedProfile').textContent=name?`✓ Ficha registrada: ${name}${breed?' · '+breed:''}`:'Sin nombre guardado todavía. Introduce el nombre y pulsa «Guardar su ficha».';
+    }
+    function render(){renderCalendar();renderTasks();renderUpcoming();renderAllSaved();renderProfile();}
+    function showForm(task=null) {
+      editingId=task?task.id:null;
+      $('formTitle').textContent=task?'Editar evento':'Añadir evento';
+      $('saveTask').textContent=task?'Guardar cambios':'Guardar evento';
+      $('taskTitle').value=task?.title??'';
+      $('taskDate').value=task?.date??selected;
+      $('taskCategory').value=task?.category??'Vacunas';
+      $('taskNotes').value=task?.notes??'';
+      feedback('taskFeedback','');$('formWrapper').hidden=false;
+      $('formWrapper').scrollIntoView({behavior:'smooth',block:'start'});
+      window.setTimeout(()=>$('taskTitle').focus({preventScroll:true}),200);
+    }
+    function hideForm() {editingId=null;$('formWrapper').hidden=true;$('taskForm').reset();feedback('taskFeedback','');}
+    function initialize() {
+      load(); if(isDownloadedFile||isEmbeddedPreview){feedback('profileFeedback','Esta es una vista de prueba. Para guardar de forma fiable, abre el enlace público HTTPS del calendario.','error');} $('petName').value=state.profile.name;$('petBreed').value=state.profile.breed;render();
+      $('prevMonth').addEventListener('click',()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar();});
+      $('nextMonth').addEventListener('click',()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar();});
+      $('goToday').addEventListener('click',()=>{selected=today();viewDate=new Date();render();});
+      $('openHelp').addEventListener('click',()=>{$('help').open=true;$('help').scrollIntoView({behavior:'smooth',block:'start'});});
+      $('addFromCalendar').addEventListener('click',()=>showForm());
+      $('closeForm').addEventListener('click',hideForm);$('cancelForm').addEventListener('click',hideForm);
+      $('petForm').addEventListener('submit',e=>{e.preventDefault();const name=$('petName').value.trim();if(!name){feedback('profileFeedback','Escribe primero el nombre de tu perro.','error');$('petName').focus();return;}const oldProfile={...state.profile};state.profile={name,breed:$('petBreed').value.trim()};if(!persist()){state.profile=oldProfile;renderProfile();feedback('profileFeedback','No se pudo guardar. Abre la web desde su dirección HTTPS, sin modo incógnito.','error');return;}renderProfile();feedback('profileFeedback','✓ Ficha guardada. Aparecerá aquí cuando vuelvas a entrar.');notice('Ficha guardada en este navegador. 🐾');});
+      $('taskForm').addEventListener('submit',e=>{
+        e.preventDefault(); const title=$('taskTitle').value.trim(),date=$('taskDate').value,category=$('taskCategory').value,notes=$('taskNotes').value.trim();
+        if(!title){feedback('taskFeedback','Escribe qué evento vas a registrar; por ejemplo, «Vacuna antirrábica».','error');$('taskTitle').focus();return;}if(!validDate(date)||!CATEGORIES.includes(category)){feedback('taskFeedback','Selecciona una fecha válida.','error');return;}
+        const before=JSON.stringify(state);
+        if(editingId){const obj=state.tasks.find(t=>t.id===editingId);if(!obj){notice('Este cuidado ya no existe.');return;}Object.assign(obj,{title,date,category,notes});}
+        else state.tasks.push({id:newId(),title,date,category,notes,done:false});
+        if(!persist()){state=JSON.parse(before);feedback('taskFeedback','No se pudo guardar. Abre la versión publicada de esta web (HTTPS) y prueba de nuevo.','error');return;}
+        selected=date;viewDate=new Date(date+'T12:00:00');hideForm();render();notice('✓ Evento guardado. Aparece en «Todos mis eventos guardados».');$('allSavedSection').scrollIntoView({behavior:'smooth',block:'start'});
+      });
+      $('allSavedList').addEventListener('click',e=>{
+        const btn=e.target.closest('button[data-go-date]');if(!btn)return;
+        selected=btn.dataset.goDate;viewDate=new Date(selected+'T12:00:00');render();$('tasksSection').scrollIntoView({behavior:'smooth',block:'start'});
+      });
+      $('taskList').addEventListener('click',e=>{
+        const btn=e.target.closest('button[data-action]');if(!btn)return;
+        const task=state.tasks.find(t=>t.id===btn.dataset.id);if(!task)return;
+        if(btn.dataset.action==='edit') showForm(task);
+        if(btn.dataset.action==='delete' && window.confirm(`¿Eliminar «${task.title}»? Esta acción no se puede deshacer.`)){const before=JSON.stringify(state);state.tasks=state.tasks.filter(t=>t.id!==task.id);if(!persist()){state=JSON.parse(before);return;}render();notice('Evento eliminado.');}
+      });
+      $('taskList').addEventListener('change',e=>{
+        const input=e.target.closest('input[data-action="toggle"]');if(!input)return;
+        const task=state.tasks.find(t=>t.id===input.dataset.id);if(!task)return;
+        const previous=task.done;task.done=input.checked;if(!persist()){task.done=previous;render();return;}render();notice(task.done?'¡Evento marcado como realizado!':'Evento marcado como pendiente.');
+      });
+      $('exportBtn').addEventListener('click',()=>{
+        const backup={version:1,exportedAt:new Date().toISOString(),profile:state.profile,tasks:state.tasks};
+        const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+        const link=document.createElement('a');const url=URL.createObjectURL(blob);
+        link.href=url;link.download='FiruBack-copia-calendario-'+today()+'.json';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);notice('Copia descargada. Guárdala en un lugar seguro.');
+      });
+      $('exportQuickBtn').addEventListener('click',()=>$('exportBtn').click());
+      $('importQuickBtn').addEventListener('click',()=>$('importFile').click());
+      $('importBtn').addEventListener('click',()=>$('importFile').click());
+      $('importFile').addEventListener('change',async e=>{
+        const file=e.target.files?.[0];if(!file)return;
+        try {
+          if(file.size>2*1024*1024)throw new Error('El archivo es demasiado grande');
+          const data=sanitizeData(JSON.parse(await file.text()));
+          if(!window.confirm('¿Restaurar esta copia? Sustituirá los cuidados y la ficha guardados actualmente en este navegador.'))return;
+          const before=state;state=data;if(!persist()){state=before;return;}$('petName').value=data.profile.name;$('petBreed').value=data.profile.breed;selected=today();viewDate=new Date();hideForm();render();notice('Copia restaurada correctamente.');
+        } catch(error) {notice('No se pudo importar: '+error.message);}
+        finally {e.target.value='';}
+      });
+      window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;});
+      window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;notice('¡Calendario añadido a tu dispositivo!');});
+      $('installBtn').addEventListener('click',async()=>{
+        if(deferredInstallPrompt){const prompt=deferredInstallPrompt;deferredInstallPrompt=null;prompt.prompt();return;}
+        const ua=navigator.userAgent||'';let message='Abre la dirección pública HTTPS en el navegador de tu teléfono. Desde el menú selecciona «Añadir a pantalla de inicio».';
+        if(/iPhone|iPad|iPod/.test(ua))message='En iPhone o iPad: abre la web en Safari → botón Compartir (cuadrado con flecha) → «Añadir a pantalla de inicio» → Añadir. Si estás en una vista previa, abre primero la dirección pública en Safari.';
+        else if(/Android/.test(ua))message='En Android: abre la web en Chrome → menú ⋮ → «Añadir a pantalla de inicio» o «Instalar aplicación» → confirma. Si estás viendo un archivo descargado, abre primero la URL pública HTTPS.';
+        $('installText').textContent=message;
+        $('installHowto').hidden=false; $('installHowto').scrollIntoView({behavior:'smooth',block:'start'});
+      });
+      $('closeInstall').addEventListener('click',()=>{$('installHowto').hidden=true;});
+      if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+        window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+      }
+      if(!storageAvailable)notice('El guardado local no está disponible. Utiliza copias de seguridad.');
+    }
+    initialize();
+  })();
+  </script>
+</body>
+</html>
